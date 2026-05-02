@@ -1,5 +1,5 @@
 ---
-title: "Welcome to Tsering"
+title: "Welcome to Art Club Frankfurt"
 ---
 
 We are a student association dedicated to [your mission here].
