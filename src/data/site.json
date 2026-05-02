@@ -1,0 +1,11 @@
+{
+  "siteName": "Tsering",
+  "tagline": "Your student association tagline here",
+  "contactEmail": "hello@example.com",
+  "googleFormUrl": "https://docs.google.com/forms/d/e/REPLACE_ME/viewform",
+  "beholdWidgetId": "REPLACE_ME",
+  "socialLinks": {
+    "instagram": "https://www.instagram.com/your-handle/",
+    "email": "hello@example.com"
+  }
+}
