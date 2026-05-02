@@ -1,0 +1,24 @@
+---
+interface Props {
+  posts: string[];
+}
+const { posts } = Astro.props;
+---
+{posts.length > 0 && (
+  <section class="max-w-5xl mx-auto px-4 py-8">
+    <h2 class="text-2xl font-bold mb-4">Photos</h2>
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {posts.map(url => (
+        <blockquote
+          class="instagram-media"
+          data-instgrm-permalink={url}
+          data-instgrm-version="14"
+          style="background:#FFF; border:0; margin: 0; max-width:540px; min-width:240px; padding:0; width:100%;"
+        >
+          <a href={url} target="_blank" rel="noopener noreferrer">View on Instagram</a>
+        </blockquote>
+      ))}
+    </div>
+    <script async src="https://www.instagram.com/embed.js"></script>
+  </section>
+)}
