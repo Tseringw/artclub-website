@@ -3,6 +3,10 @@
 **Date:** 2026-05-02
 **Status:** Approved by user; ready for implementation planning
 
+## Revisions
+
+- **2026-05-03 — Host changed from Cloudflare Pages to Vercel.** Reason: `info@artclub-frankfurt.de` email is hosted at Zoho with DNS managed at Strato. Cloudflare Pages on the apex domain would have required full nameserver migration to Cloudflare, with non-trivial risk to the Zoho email setup (MX/SPF/DKIM records all needing replication). Vercel supports apex domains with plain A/CNAME records added at the existing DNS host (Strato), so DNS stays put and email is untouched. All other architectural choices unchanged. README §5 has the current deploy procedure.
+
 ## 1. Project Summary
 
 A simple website for a student association. The site is a thin wrapper around the association's existing presence on Instagram, Luma, and Google Forms. It primarily displays static information (about, contact) and surfaces dynamic content from external services. There is no authentication, no member management, and no backend application — the site is fully static.

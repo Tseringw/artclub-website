@@ -17,12 +17,12 @@ The site is fully static. There is no login, no database, no backend.
 |---|---|---|
 | Framework | Astro 6.x | Best SSG for content-heavy sites; great markdown support; ships almost zero JS. |
 | Styling | Tailwind CSS v4 | Utility-first; fast iteration; well-audited; no design-system overhead. |
-| Hosting | Cloudflare Pages | Free, generous bandwidth, deploys on `git push`, easy custom domain. |
+| Hosting | Vercel | Free tier covers our use; deploys on `git push`; supports apex domains via plain DNS records (no nameserver migration needed). |
 | Repo | GitHub | The github.com web editor is the editor's primary content tool. |
-| Package manager | pnpm | Default standard; works on CF Pages. |
+| Package manager | pnpm | Default standard; supported by Vercel. |
 | Site config | JSON + Zod | Native TS JSON import (no parser dep); validated at build time. |
 
-Alternatives considered: Next.js (heavier, app-oriented), Hugo (less ergonomic for embeds), Vercel (equivalent to CF Pages — pick if preferred), Decap CMS (rejected — adds maintenance surface for marginal UX gain on a mostly-read-only site), YAML for site config (rejected — would add `js-yaml` for marginal editor UX gain on an "almost-never-edited" file).
+Alternatives considered: Next.js (heavier, app-oriented), Hugo (less ergonomic for embeds), **Cloudflare Pages** (rejected — would have required moving DNS off Strato to Cloudflare for apex-domain support, with risk to the existing Zoho email setup; functionally equivalent for our use case), Decap CMS (rejected — adds maintenance surface for marginal UX gain on a mostly-read-only site), YAML for site config (rejected — would add `js-yaml` for marginal editor UX gain on an "almost-never-edited" file).
 
 ## 2.1 Security & dependency policy
 
@@ -67,25 +67,33 @@ pnpm test         # run unit tests (vitest)
 
 ## 5. Deploy
 
-### One-time setup (Cloudflare Pages)
+### One-time setup (Vercel)
 
-1. Push the repo to GitHub.
-2. In the Cloudflare dashboard → Workers & Pages → Create application → Pages → Connect to Git.
-3. Select the repo. Build settings:
-   - **Framework preset:** Astro
-   - **Build command:** `pnpm build`
-   - **Build output directory:** `dist`
-   - **Environment variable:** `NODE_VERSION = 22` (or higher)
-4. Save and deploy. The first deploy gives you a `<project>.pages.dev` URL.
-5. Add your custom domain: project → Custom domains → Set up. Update DNS as instructed.
+1. Push the repo to GitHub (already done).
+2. <https://vercel.com/signup> → "Continue with GitHub". Authorize Vercel to access the `Tseringw` org / your account.
+3. **Add New → Project** → import `Tseringw/artclub-website`. Vercel auto-detects Astro; leave the defaults:
+   - Build command: `pnpm build` (auto)
+   - Output directory: `dist` (auto)
+   - Install command: `pnpm install` (auto)
+4. **Deploy.** First build takes ~2 min. You get a live URL like `https://artclub-website.vercel.app`.
+
+### Custom domain (DNS stays at Strato; Zoho email untouched)
+
+1. Project → **Settings → Domains** → add `artclub-frankfurt.de`.
+2. Vercel shows the DNS records to add at Strato:
+   - `A` record, name `@`, value `76.76.21.21`
+   - `CNAME` record, name `www`, value `cname.vercel-dns.com`
+3. At Strato (`strato.de` → Customer Service → Domainverwaltung → DNS-Verwaltung): add **only those two records**. Leave everything else (especially MX and TXT/SPF/DKIM for Zoho) exactly as-is.
+4. Vercel auto-provisions HTTPS in ~5 min and verifies the domain.
+5. Smoke-test: `curl -I https://artclub-frankfurt.de` returns 200; send a test email to `info@artclub-frankfurt.de` to confirm Zoho still receives it.
 
 ### Updates
 
-Push to `main` → CF Pages rebuilds in ~30 seconds. Branches and PRs get preview deploys automatically.
+Push to `main` → Vercel rebuilds in ~30 seconds. Branches and PRs get preview deploys automatically.
 
 ### Rollback
 
-CF Pages dashboard → Deployments → click any prior deploy → "Rollback to this deployment".
+Vercel dashboard → project → **Deployments** → click any prior deployment → **Promote to Production**.
 
 ## 6. Content editing guide (for non-devs)
 
@@ -163,7 +171,9 @@ All content is edited on github.com. You don't need to install anything.
 | **Instagram embeds** | Per-event photo grids | `instagramPosts:` array in each event's frontmatter | N/A — Instagram-native |
 | **Luma** | Event registration | `lumaUrl` in each event's frontmatter | N/A — just swap the URL |
 | **Google Form** | Membership signup | `googleFormUrl` in `src/data/site.json` | Swap the URL |
-| **Cloudflare Pages** | Hosting + CI/CD | CF dashboard | Move to Vercel: import the repo, set build command `pnpm build`, output dir `dist` |
+| **Vercel** | Hosting + CI/CD | Vercel dashboard | Move to Cloudflare Pages or Netlify: connect repo, set build command `pnpm build`, output dir `dist`. (For CF Pages on apex `artclub-frankfurt.de`: requires moving DNS to Cloudflare too.) |
+| **Strato** | Domain registrar + DNS host | DNS records in Strato Domainverwaltung; `A @ → 76.76.21.21` and `CNAME www → cname.vercel-dns.com` point at Vercel | Move DNS to another provider by exporting/replicating records. |
+| **Zoho Mail** | Email at `info@artclub-frankfurt.de` | MX + SPF/DKIM/DMARC TXT records at Strato | N/A — keep DNS records in place; Zoho is independent of the website host. |
 
 ## 8. Common maintenance tasks
 
@@ -173,13 +183,15 @@ All content is edited on github.com. You don't need to install anything.
   1. Create `src/content/site/sponsors.md` with frontmatter + body.
   2. Create `src/pages/sponsors.astro` mirroring `about.astro`.
   3. Add a link to the new page in the nav inside `src/layouts/BaseLayout.astro`.
-- **Change the domain:** update `site:` in `astro.config.mjs`, then attach the new domain in CF Pages.
+- **Change the domain:** update `site:` in `astro.config.mjs`, then attach the new domain in Vercel (Settings → Domains) and add the corresponding DNS records at the new domain's registrar.
 - **Disable an event temporarily:** delete the event's `.md` file (keep the `.md` somewhere else if you'll restore it).
 
 ## 9. Troubleshooting
 
-- **Build fails on CF Pages but works locally:** check the Node version env var (set `NODE_VERSION = 22` or higher in the CF dashboard).
+- **Build fails on Vercel but works locally:** check the Node version (Vercel → Settings → General → Node.js version; set to 22.x or higher).
 - **Deploy stuck "in progress":** trigger a new deploy from the dashboard, or push an empty commit (`git commit --allow-empty -m "trigger deploy"`).
+- **Custom domain stuck on "Invalid Configuration":** verify in the Strato DNS panel that the `A @ 76.76.21.21` and `CNAME www cname.vercel-dns.com` records are present and that no conflicting `A`/`AAAA` records remain on `@` or `www`. DNS changes can take up to 30 min to propagate.
+- **Email at `info@artclub-frankfurt.de` not arriving after deploy:** verify Zoho's MX records are still in Strato's DNS panel (typically `mx.zoho.eu`/`mx2.zoho.eu`/`mx3.zoho.eu`, or `mx.zoho.com` for US accounts). The Vercel setup should not have touched these — only added two new records.
 - **Instagram embeds show only "View on Instagram" links:** Instagram's `embed.js` failed to load (rate-limited, blocked, or post is private). Refresh; if persistent, the post may be from a private account.
 - **behold widget shows nothing:** check `beholdWidgetId` in `site.json` matches the ID in the behold dashboard, and that the connected Instagram account has at least one public post.
 - **Frontmatter validation error in build log:** check that the event's frontmatter matches the schema in `src/content.config.ts` — `date` must be a valid date, `lumaUrl` must be a valid URL.

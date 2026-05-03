@@ -13,16 +13,17 @@ Prioritized follow-ups for the Art Club Frankfurt website. Pick from the top dow
 - Commit, push → home page goes from "not configured yet" placeholder to live carousel
 - Time: ~5-10 min interactive setup, then 30 sec to wire
 
-### 🟡 Deploy to Cloudflare Pages
-- CF dashboard → Workers & Pages → Create → Pages → Connect to Git → select `Tseringw/artclub-website`
-- Build settings:
-  - Framework preset: **Astro**
-  - Build command: `pnpm build`
-  - Build output directory: `dist`
-  - Env var: `NODE_VERSION=22`
-- After first deploy succeeds: project → Custom domains → add `artclub-frankfurt.de` → follow DNS instructions
-- Time: ~15 min total
-- Effect: live URL she can open on her phone, plus auto-deploy on every push
+### 🟡 Deploy to Vercel
+- Chosen over Cloudflare Pages because: DNS stays at Strato (Zoho email untouched, zero risk); only adds 2 records at Strato instead of full nameserver migration.
+- <https://vercel.com/signup> → "Continue with GitHub" → import `Tseringw/artclub-website` → auto-detects Astro → Deploy.
+- After first deploy: project → Settings → Domains → add `artclub-frankfurt.de`. Vercel shows the DNS records to add at Strato:
+  - `A` record, name `@`, value `76.76.21.21`
+  - `CNAME` record, name `www`, value `cname.vercel-dns.com`
+- At Strato: **Domainverwaltung → DNS-Verwaltung →** add those two records. Don't delete or modify any of the Zoho-related records (MX, SPF/TXT, DKIM).
+- Wait ~5-10 min for HTTPS to provision.
+- Test: `curl -I https://artclub-frankfurt.de` returns 200; send a test email to `info@artclub-frankfurt.de` to confirm Zoho still works.
+- Time: ~15 min total.
+- Effect: live URL she can open on her phone, plus auto-deploy on every push.
 
 ### 🟢 Wire the real Google Form URL
 - When the membership form exists, paste its URL into `src/data/site.json` → `googleFormUrl`
@@ -50,8 +51,8 @@ Prioritized follow-ups for the Art Club Frankfurt website. Pick from the top dow
 - Tools: `@astrojs/sitemap` (sitemap.xml), build-time OG image generation
 
 ### 🟢 Analytics (optional, later)
-- Cloudflare Web Analytics is privacy-friendly + free + one-line addition
-- No cookie banner needed (no PII)
+- Vercel Web Analytics is privacy-friendly + free tier + one-line addition (`@vercel/analytics` in the BaseLayout). Or Plausible / Cloudflare Web Analytics as alternatives.
+- No cookie banner needed (no PII).
 
 ## Done so far
 
