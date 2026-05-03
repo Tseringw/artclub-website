@@ -1,5 +1,5 @@
 export interface EventLike {
-  slug: string;
+  id: string;
   data: { date: Date };
 }
 
@@ -29,4 +29,16 @@ export function partitionEvents<T extends EventLike>(
     .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 
   return { upcoming, past };
+}
+
+/**
+ * Editorial eyebrow for an event row: "JUNE 15 · 5:30 PM" if a time is given,
+ * otherwise "JUNE 15 · 2026". Year is shown only when no time is set, to keep
+ * the row uncluttered while still disambiguating multi-year listings.
+ */
+export function formatEventEyebrow(date: Date, time?: string): string {
+  const month = date.toLocaleDateString('en-US', { month: 'long' }).toUpperCase();
+  const day = date.getDate();
+  const detail = time?.trim() || String(date.getFullYear());
+  return `${month} ${day} · ${detail}`;
 }

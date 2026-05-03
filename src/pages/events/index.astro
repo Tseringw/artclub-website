@@ -1,33 +1,98 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import EventRow from '../../components/EventRow.astro';
 import { getCollection } from 'astro:content';
 import { partitionEvents } from '../../lib/events';
-import EventCard from '../../components/EventCard.astro';
 
 const all = await getCollection('events');
-const withSlug = all.map(e => ({ ...e, slug: e.id }));
-const { upcoming, past } = partitionEvents(withSlug);
+const { upcoming, past } = partitionEvents(all);
 ---
-<BaseLayout title="Events">
-  <div class="max-w-5xl mx-auto px-4 py-8 space-y-12">
-    <section>
-      <h1 class="text-3xl font-bold mb-6">Upcoming events</h1>
+<BaseLayout
+  title="Events"
+  description="Upcoming and past events from Art Club Frankfurt — gallery visits, talks, and member nights."
+>
+  <div class="events-page">
+    <header class="events-page__header">
+      <h1 class="events-page__title">Events</h1>
+    </header>
+
+    <section class="events-page__section">
+      <p class="eyebrow events-page__section-label">Upcoming</p>
       {upcoming.length === 0 ? (
-        <p class="text-gray-600">No upcoming events right now.</p>
+        <p class="events-page__empty">No upcoming events right now — check back soon.</p>
       ) : (
-        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {upcoming.map(event => <EventCard event={event} />)}
-        </div>
+        <ul class="events-page__list">
+          {upcoming.map(event => (
+            <li><EventRow event={event} /></li>
+          ))}
+        </ul>
       )}
     </section>
 
     {past.length > 0 && (
-      <section>
-        <h2 class="text-2xl font-bold mb-6">Past events</h2>
-        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {past.map(event => <EventCard event={event} />)}
-        </div>
+      <section class="events-page__section">
+        <p class="eyebrow events-page__section-label">Past Events</p>
+        <ul class="events-page__list">
+          {past.map(event => (
+            <li><EventRow event={event} /></li>
+          ))}
+        </ul>
       </section>
     )}
   </div>
 </BaseLayout>
+
+<style>
+  .events-page {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 5rem 1.5rem 6rem;
+  }
+
+  .events-page__header {
+    text-align: center;
+    margin-bottom: 4rem;
+  }
+
+  .events-page__title {
+    font-family: var(--font-serif);
+    font-size: var(--text-h1);
+    font-weight: 400;
+    color: var(--color-ink);
+    margin: 0;
+  }
+
+  .events-page__section {
+    margin-bottom: 4.5rem;
+  }
+  .events-page__section:last-child { margin-bottom: 0; }
+
+  .events-page__section-label {
+    text-align: center;
+    margin: 0 0 1.5rem;
+  }
+
+  .events-page__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border-bottom: 1px solid var(--color-hairline);
+  }
+
+  .events-page__empty {
+    font-family: var(--font-serif);
+    font-style: italic;
+    color: var(--color-ink-2);
+    text-align: center;
+    margin: 0;
+    padding: 2rem 0;
+  }
+
+  @media (max-width: 480px) {
+    .events-page {
+      padding: 3rem 1.25rem 4rem;
+    }
+    .events-page__header { margin-bottom: 2.5rem; }
+    .events-page__section { margin-bottom: 3rem; }
+  }
+</style>

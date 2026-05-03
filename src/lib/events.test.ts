@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { partitionEvents, type EventLike } from './events';
+import { partitionEvents, formatEventEyebrow, type EventLike } from './events';
 
-const make = (slug: string, date: string): EventLike => ({
-  slug,
+const make = (id: string, date: string): EventLike => ({
+  id,
   data: { date: new Date(date) },
 });
 
@@ -16,7 +16,7 @@ describe('partitionEvents', () => {
       make('b', '2026-07-20'),
     ];
     const { upcoming } = partitionEvents(events, today);
-    expect(upcoming.map(e => e.slug)).toEqual(['a', 'b', 'c']);
+    expect(upcoming.map(e => e.id)).toEqual(['a', 'b', 'c']);
   });
 
   it('puts events before today into past, sorted descending (most recent first)', () => {
@@ -26,13 +26,13 @@ describe('partitionEvents', () => {
       make('z', '2025-11-01'),
     ];
     const { past } = partitionEvents(events, today);
-    expect(past.map(e => e.slug)).toEqual(['y', 'x', 'z']);
+    expect(past.map(e => e.id)).toEqual(['y', 'x', 'z']);
   });
 
   it('treats events on the same day as today as upcoming', () => {
     const events: EventLike[] = [make('today', '2026-05-02')];
     const { upcoming, past } = partitionEvents(events, today);
-    expect(upcoming.map(e => e.slug)).toEqual(['today']);
+    expect(upcoming.map(e => e.id)).toEqual(['today']);
     expect(past).toEqual([]);
   });
 
@@ -50,7 +50,21 @@ describe('partitionEvents', () => {
       make('future2', '2026-06-05'),
     ];
     const { upcoming, past } = partitionEvents(events, today);
-    expect(upcoming.map(e => e.slug)).toEqual(['future2', 'future1']);
-    expect(past.map(e => e.slug)).toEqual(['past2', 'past1']);
+    expect(upcoming.map(e => e.id)).toEqual(['future2', 'future1']);
+    expect(past.map(e => e.id)).toEqual(['past2', 'past1']);
+  });
+});
+
+describe('formatEventEyebrow', () => {
+  it('renders MONTH DAY · YEAR when no time is given', () => {
+    expect(formatEventEyebrow(new Date('2026-06-15T00:00:00Z'))).toBe('JUNE 15 · 2026');
+  });
+
+  it('renders MONTH DAY · TIME when a time string is given', () => {
+    expect(formatEventEyebrow(new Date('2026-05-06T00:00:00Z'), '5:30 PM')).toBe('MAY 6 · 5:30 PM');
+  });
+
+  it('treats whitespace-only time as missing', () => {
+    expect(formatEventEyebrow(new Date('2026-05-06T00:00:00Z'), '   ')).toBe('MAY 6 · 2026');
   });
 });
