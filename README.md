@@ -245,6 +245,8 @@ All content is edited on github.com. You don't need to install anything.
    ---
    title: "Your Event Title"
    date: 2026-09-15
+   time: "7:00 PM"
+   subtitle: "Frankfurt · Schirn Kunsthalle · Free for members"
    lumaUrl: "https://lu.ma/your-luma-event-id"
    ---
 
@@ -254,6 +256,8 @@ All content is edited on github.com. You don't need to install anything.
    - one
    - two
    ```
+
+   Both `time` and `subtitle` are optional — leave them out if you don't have them. With `time`, the event row reads `MAY 6 · 7:00 PM`; without, it reads `MAY 6 · 2026`. Subtitle is the short single-line venue/details that shows below the title.
 
 4. Commit. The event appears on the site within ~30 seconds.
 

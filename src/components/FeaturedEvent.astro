@@ -1,16 +1,11 @@
 ---
 import { getCollection } from 'astro:content';
-import { partitionEvents } from '../lib/events';
+import { partitionEvents, formatEventEyebrow } from '../lib/events';
 
 const all = await getCollection('events');
 const withSlug = all.map(e => ({ ...e, slug: e.id }));
 const { upcoming } = partitionEvents(withSlug);
 const next = upcoming[0];
-
-function formatEventDate(d: Date): string {
-  const month = d.toLocaleDateString('en-US', { month: 'long' }).toUpperCase();
-  return `${month} ${d.getDate()} · ${d.getFullYear()}`;
-}
 ---
 <section class="featured-event">
   <div class="featured-event__inner">
@@ -18,7 +13,10 @@ function formatEventDate(d: Date): string {
     {next ? (
       <>
         <h2 class="featured-event__title">{next.data.title}</h2>
-        <p class="featured-event__meta">{formatEventDate(next.data.date)}</p>
+        <p class="featured-event__meta">{formatEventEyebrow(next.data.date, next.data.time)}</p>
+        {next.data.subtitle && (
+          <p class="featured-event__subtitle">{next.data.subtitle}</p>
+        )}
         <div class="featured-event__ctas">
           <a
             href={next.data.lumaUrl}
@@ -67,9 +65,19 @@ function formatEventDate(d: Date): string {
     font-style: italic;
     font-size: 0.9375rem;
     color: var(--color-ink-2);
-    margin: 0 0 2rem;
+    margin: 0 0 0.35rem;
     letter-spacing: 0.01em;
   }
+
+  .featured-event__subtitle {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 0.9375rem;
+    color: var(--color-ink-2);
+    margin: 0 0 2rem;
+  }
+
+  .featured-event__meta:last-of-type { margin-bottom: 2rem; }
 
   .featured-event__ctas {
     display: flex;

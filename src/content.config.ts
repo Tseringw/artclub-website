@@ -6,6 +6,8 @@ const events = defineCollection({
   schema: z.object({
     title: z.string(),
     date: z.coerce.date(),
+    time: z.string().optional(),
+    subtitle: z.string().optional(),
     lumaUrl: z.string().url(),
     coverImage: z.string().optional(),
     instagramPosts: z.array(z.string().url()).optional().default([]),

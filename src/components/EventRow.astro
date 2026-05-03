@@ -1,0 +1,79 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { formatEventEyebrow } from '../lib/events';
+
+interface Props {
+  event: CollectionEntry<'events'>;
+}
+const { event } = Astro.props;
+const { data } = event;
+const eyebrow = formatEventEyebrow(data.date, data.time);
+const href = `/events/${event.id}`;
+---
+<a href={href} class="event-row">
+  <div class="event-row__main">
+    <p class="eyebrow event-row__eyebrow">{eyebrow}</p>
+    <h3 class="event-row__title">{data.title}</h3>
+    {data.subtitle && (
+      <p class="event-row__subtitle">{data.subtitle}</p>
+    )}
+  </div>
+  <span class="event-row__arrow" aria-hidden="true">→</span>
+</a>
+
+<style>
+  .event-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 2rem 0;
+    border-top: 1px solid var(--color-hairline);
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .event-row__main {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .event-row__eyebrow {
+    margin: 0 0 0.5rem;
+    transition: color 150ms ease;
+  }
+
+  .event-row__title {
+    font-family: var(--font-serif);
+    font-size: var(--text-h2);
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--color-ink);
+    margin: 0;
+    transition: color 150ms ease;
+  }
+
+  .event-row__subtitle {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 0.8125rem;
+    color: var(--color-ink-2);
+    margin: 0.6rem 0 0;
+  }
+
+  .event-row__arrow {
+    flex-shrink: 0;
+    font-family: var(--font-serif);
+    font-size: 1.25rem;
+    color: var(--color-ink-3);
+    transition: color 150ms ease;
+  }
+
+  .event-row:hover .event-row__title { color: var(--color-burgundy); }
+  .event-row:hover .event-row__arrow { color: var(--color-burgundy); }
+
+  @media (max-width: 480px) {
+    .event-row { padding: 1.5rem 0; }
+    .event-row__title { font-size: 1.5rem; }
+  }
+</style>
