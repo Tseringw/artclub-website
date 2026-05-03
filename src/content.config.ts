@@ -5,13 +5,13 @@ const events = defineCollection({
   // Pattern excludes files starting with `_` so `_TEMPLATE.md` (the editor's
   // copy-paste reference) doesn't get treated as a real event.
   loader: glob({ pattern: ['**/*.md', '!**/_*.md'], base: './src/content/events' }),
-  schema: z.object({
+  schema: ({ image }) => z.object({
     title: z.string(),
     date: z.coerce.date(),
     time: z.string().optional(),
     subtitle: z.string().optional(),
     lumaUrl: z.string().url(),
-    coverImage: z.string().optional(),
+    coverImage: image().optional(),
     instagramPosts: z.array(z.string().url()).optional().default([]),
   }),
 });
