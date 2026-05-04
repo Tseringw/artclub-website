@@ -1,7 +1,8 @@
 ---
 title: "Home"
-heroTitle: "Connecting people through art."
-heroSubtitle: "Student initiative at Goethe University, Frankfurt."
+heroTitle: "Connecting students through shared art experiences."
+heroSubtitle: "Student initiative at Goethe University Frankfurt"
 ---
 
-Art Club Frankfurt is a student-run initiative at Goethe University. We organise gallery visits, talks, and member nights to bring people together around art — students, alumni, and anyone curious about the local art scene.
+A community of students from all fields of study with a shared interest in art.
+Through our events, we create a space for exchange, inspiration, and new perspectives.
