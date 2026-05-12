@@ -1,12 +1,11 @@
 ---
-title: "About"
+title: About
 ---
-
 Art Club Frankfurt is a student-run initiative based at Goethe University, Frankfurt. We organise gallery visits, talks, screenings, and member nights to bring people together around art — students, alumni, and anyone curious about the local art scene.
 
 ## Our mission
 
-Tell the story of why this club exists. What is your motivation? Edit this section in `src/content/site/about.md` on github.com.
+......
 
 ## What we do
 
